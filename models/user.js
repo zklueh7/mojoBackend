@@ -16,7 +16,7 @@ const { BCRYPT_WORK_FACTOR } = require("../config.js");
 class User {
   /** authenticate user with username, password.
    *
-   * Returns { username, first_name, last_name, email, looking_for_partners, climbing_type, experience_level, picture_url }
+   * Returns { username, first_name, last_name, email }
    *
    * Throws UnauthorizedError is user not found or wrong password.
    **/
@@ -28,11 +28,7 @@ class User {
                   password,
                   first_name AS "firstName",
                   last_name AS "lastName",
-                  email,
-                  looking_for_partners AS "lookingForPartners",
-                  climbing_type AS "climbingType",
-                  experience_level AS "experienceLevel",
-                  picture_url AS "pictureUrl"
+                  email
            FROM users
            WHERE username = $1`,
         [username],
@@ -60,7 +56,7 @@ class User {
    **/
 
   static async register(
-      { username, password, firstName, lastName, email, lookingForPartners, climbingType, experienceLevel, pictureUrl }) {
+      { username, password, firstName, lastName, email }) {
     const duplicateCheck = await db.query(
           `SELECT username
            FROM users
@@ -80,23 +76,15 @@ class User {
             password,
             first_name,
             last_name,
-            email,
-            looking_for_partners,
-            climbing_type,
-            experience_level,
-            picture_url)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-           RETURNING username, first_name AS "firstName", last_name AS "lastName", email, looking_for_partners AS "lookingForPartners", climbing_type AS "climbingType", experience_level AS "experienceLevel", picture_url AS "pictureUrl"`,
+            email)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING username, first_name AS "firstName", last_name AS "lastName", email`,
         [
           username,
           hashedPassword,
           firstName,   
           lastName,
-          email,
-          lookingForPartners,
-          climbingType,
-          experienceLevel,
-          pictureUrl
+          email
         ],
     );
 
@@ -116,11 +104,7 @@ class User {
               password,
               first_name AS "firstName",
               last_name AS "lastName",
-              email,
-              looking_for_partners AS "lookingForPartners",
-              climbing_type AS "climbingType",
-              experience_level AS "experienceLevel",
-              picture_url AS "pictureUrl"
+              email
           FROM users
           ORDER BY username`,
     );
@@ -141,11 +125,7 @@ class User {
                   password,
                   first_name AS "firstName",
                   last_name AS "lastName",
-                  email,
-                  looking_for_partners AS "lookingForPartners",
-                  climbing_type AS "climbingType",
-                  experience_level AS "experienceLevel",
-                  picture_url AS "pictureUrl"
+                  email
            FROM users
            WHERE username = $1`,
         [username],
@@ -164,9 +144,9 @@ class User {
    * all the fields; this only changes provided ones.
    *
    * Data can include:
-   *   { firstName, lastName, password, email, looking_for_partners, climbing_type, experience_level, picture_url }
+   *   { firstName, lastName, password, email }
    *
-   * Returns { username, firstName, lastName, email, looking_for_partners, climbing_type, experience_level, picture_url }
+   * Returns { username, firstName, lastName, email }
    *
    * Throws NotFoundError if not found.
    *
@@ -185,11 +165,7 @@ class User {
         {
           firstName: "first_name",
           lastName: "last_name",
-          email: "email",
-          lookingForPartners: "looking_for_partners",
-          climbingType: "climbing_type",
-          experienceLevel: "experience_level",
-          pictureUrl: "picture_url"
+          email: "email"
         });
     const usernameVarIdx = "$" + (values.length + 1);
 
@@ -199,11 +175,7 @@ class User {
                       RETURNING username,
                                 first_name AS "firstName",
                                 last_name AS "lastName",
-                                email,
-                                looking_for_partners AS "lookingForPartners",
-                                climbing_type AS "climbingType",
-                                experience_level AS "experienceLevel",
-                                picture_url AS "pictureUrl"`;
+                                email`;
     const result = await db.query(querySql, [...values, username]);
     const user = result.rows[0];
 

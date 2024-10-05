@@ -3,7 +3,7 @@
 /** Routes for messages. */
 
 const express = require("express");
-const Message = require("../models/message");
+const Message = require("../models/dog");
 
 const router = express.Router();
 

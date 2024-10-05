@@ -23,18 +23,6 @@
       "minLength": 6,
       "maxLength": 60,
       "format": "email"
-    },
-    "lookingForPartners": {
-      "type": "string"
-    },
-    "climbingType": {
-      "type": "string"
-    },
-    "experienceLevel": {
-      "type": "string"
-    },
-    "pictureUrl": {
-      "type": "string"
     }
   },
   "additionalProperties": false,
