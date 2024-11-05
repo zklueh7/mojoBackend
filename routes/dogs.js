@@ -3,23 +3,20 @@
 /** Routes for messages. */
 
 const express = require("express");
-const Message = require("../models/dog");
+const Dog = require("../models/dog_owner_rq");
 
 const router = express.Router();
 
-/** GET / => { messages: [ id, latitude, longitude, description, pictureUrl }, ... ] }
+/** GET / => { dogs: [ {dogInfo}, ... ] }
  *
- * Returns list of all areas.
+ * Returns list of all dogs.
  *
  **/
 
 router.get("/", async function (req, res, next) {
   try {
-    const q = req.query;
-    console.log(q);
-    const messages = await Message.findAll(q);
-    console.log(messages);
-    return res.json({ messages });
+    const dogs = await Dog.findAll();
+    return res.json({ dogs });
   } catch (err) {
     return next(err);
   }
@@ -31,25 +28,26 @@ router.get("/", async function (req, res, next) {
  *
  **/
 
-router.get("/:id", async function (req, res, next) {
+router.get("/:dog_name", async function (req, res, next) {
   try {
-    const message = await Message.get(req.params.area);
-    return res.json({ message });
+    const dog = await Dog.find(req.params.dog_name);
+    return res.json({ dog });
   } catch (err) {
     return next(err);
   }
 });
 
-/** POST / { messages }
+/** POST / { dog }
  *
- * Returns { messages }
+ * Returns { dog }
  *
  **/
 
 router.post("/", async function (req, res, next) {
   try {
-    const message = await Message.create(req.body);
-    return res.json({ message });
+    const dog = await Dog.create(req.body);
+    console.log(dog);
+    return res.status(201).json({ dog });
   } catch (err) {
     return next(err);
   }
