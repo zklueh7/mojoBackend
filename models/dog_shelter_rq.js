@@ -1,147 +1,254 @@
 "use strict";
 
 const db = require("../db");
-const { NotFoundError} = require("../expressError");
 const { sqlForPartialUpdate } = require("../helpers/sql");
+const {
+  NotFoundError,
+} = require("../expressError");
 
 
-/** Related functions for companies. */
 
-class Message {
-  /** Create a message (from data), update db, return new message data.
+/** Related functions for dogs (owner relinquished). */
+
+class DogShelterRq {
+
+  /** Find all dogs.
    *
-   * data should be { message_text, area, from_user, time_posted }
-   *
-   * Returns { id, message_text, area, from_user, time_posted }
+   * Returns [{ dog_name }, ...]
    **/
 
-  static async create(data) {
+  static async findAll() {
     const result = await db.query(
-          `INSERT INTO messages (message_text,
-                             area,
-                             from_user)
-           VALUES ($1, $2, $3)
-           RETURNING id, message_text AS "messageText", area, from_user AS "fromUser", time_posted AS "timePosted"`,
-        [
-          data.messageText,
-          data.area,
-          data.fromUser,
-        ]);
-    let message = result.rows[0];
+      `SELECT dog_id, dog_name FROM dogs_shelter_rq`
+    );
 
-    return message;
+    return result.rows;
   }
 
-  /** Find all messages for an area.
+  /** Given a username, return data about user.
    *
-   * searchFilters (all optional):
-   * - area
+   * Returns { username, first_name, last_name, looking_for_partners, climbing_type, experience_level, picture_url }
    *
-   * Returns [{ id, messageText, area, fromUser, timePosted }, ...]
-   * */
-
-  static async findAll(searchFilters = {}) {
-    console.log("searchFilters", searchFilters);
-    const { area } = searchFilters;
-    const messagesRes = await db.query(
-                `SELECT m.id,
-                        m.message_text AS "messageText",
-                        m.area,
-                        m.from_user AS "fromUser",
-                        m.time_posted AS "timePosted",
-                        u.picture_url AS "pictureUrl"
-                FROM messages m
-                LEFT JOIN users AS u ON u.username = m.from_user
-                WHERE area = $1
-                ORDER BY m.time_posted ASC;`, [area]);
-
-    return messagesRes.rows; 
-  }
-
-  /** Given a message id, return data about message.
-   *
-   * Returns { id, messageText, area, fromUser, timePosted }
-   *   where area is { name, latitude, longitude, description, pictureUrl }
-   *
-   * Throws NotFoundError if not found.
+   * Throws NotFoundError if user not found.
    **/
 
-  static async get(id) {
-    const messageRes = await db.query(
-          `SELECT id,
-                  message_text AS "messageText",
-                  area,
-                  from_user AS "fromUser",
-                  time_posted AS "timePosted"
-           FROM messages
-           WHERE id = $1`, [id]);
+  static async find(dog_id) {
+    const result = await db.query(
+      `SELECT *
+           FROM dogs_shelter_rq
+           WHERE dog_id = $1`,
+      [dog_id],
+    );
 
-    const message = messageRes.rows[0];
+    const dog = result.rows[0];
 
-    if (!message) throw new NotFoundError(`No message: ${id}`);
+    if (!dog) throw new NotFoundError(`No dog: ${dog_name}`);
 
-    const areasRes = await db.query(
-          `SELECT name,
-                  latitude,
-                  longitude,
-                  description,
-                  picture_url AS "pictureUrl"
-           FROM areas
-           WHERE handle = $1`, [message.area]);
-
-    message.area = areasRes.rows[0];
-        
-    return message;
+    return dog;
   }
 
-  /** Update message data with `data`.
+  /** Add new dog data
+ *
+ * Returns { name, foodType, toppings }
+ **/
+
+  static async create(
+    { owner_first_name,
+      owner_last_name,
+      owner_st_address,
+      owner_city,
+      owner_state,
+      owner_zip,
+      owner_email,
+      owner_home_phone,
+      owner_cell_phone,
+      photos,
+      dog_name,
+      dog_sex,
+      dog_age,
+      dog_color,
+      dog_breed,
+      relinquish_reason,
+      how_far_owner,
+      dog_purchase,
+      dog_bite,
+      dog_nip,
+      dog_health,
+      dog_vet_hist,
+      dog_heartform,
+      dog_kids,
+      dog_negative,
+      dog_fearful,
+      dog_negative_deets,
+      dog_noises,
+      dog_movement,
+      dog_tricks,
+      dog_adjectives,
+      dog_agro_examples,
+      dog_improvement,
+      dog_location,
+      dog_alone,
+      dog_crate_time,
+      dog_crate_behavior,
+      dog_crate_behavior_deets,
+      dog_animals,
+      attest }) {
+    const result = await db.query(
+      `INSERT INTO dogs_shelter_rq
+           (owner_first_name,
+            owner_last_name,
+            owner_st_address,
+            owner_city,
+            owner_state,
+            owner_zip,
+            owner_email,
+            owner_home_phone,
+            owner_cell_phone,
+            photos,
+            dog_name,
+            dog_sex,
+            dog_age,
+            dog_color,
+            dog_breed,
+            relinquish_reason,
+            how_far_owner,
+            dog_purchase,
+            dog_bite,
+            dog_nip,
+            dog_health,
+            dog_vet_hist,
+            dog_heartform,
+            dog_kids,
+            dog_negative,
+            dog_fearful,
+            dog_negative_deets,
+            dog_noises,
+            dog_movement,
+            dog_tricks,
+            dog_adjectives,
+            dog_agro_examples,
+            dog_improvement,
+            dog_location,
+            dog_alone,
+            dog_crate_time,
+            dog_crate_behavior,
+            dog_crate_behavior_deets,
+            dog_animals,
+            attest)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40)
+           RETURNING dog_id`,
+      [
+        owner_first_name,
+            owner_last_name,
+            owner_st_address,
+            owner_city,
+            owner_state,
+            owner_zip,
+            owner_email,
+            owner_home_phone,
+            owner_cell_phone,
+            photos,
+            dog_name,
+            dog_sex,
+            dog_age,
+            dog_color,
+            dog_breed,
+            relinquish_reason,
+            how_far_owner,
+            dog_purchase,
+            dog_bite,
+            dog_nip,
+            dog_health,
+            dog_vet_hist,
+            dog_heartform,
+            dog_kids,
+            dog_negative,
+            dog_fearful,
+            dog_negative_deets,
+            dog_noises,
+            dog_movement,
+            dog_tricks,
+            dog_adjectives,
+            dog_agro_examples,
+            dog_improvement,
+            dog_location,
+            dog_alone,
+            dog_crate_time,
+            dog_crate_behavior,
+            dog_crate_behavior_deets,
+            dog_animals,
+            attest
+      ],
+    );
+
+    const dog = result.rows[0];
+
+    return dog;
+  }
+
+  /** Update user data with `data`.
    *
-   * Edit the text of the message
+   * This is a "partial update" --- it's fine if data doesn't contain
+   * all the fields; this only changes provided ones.
    *
-   * Data can include: { message_text }
+   * Data can include:
+   *   { firstName, lastName, password, email }
    *
-   * Returns { id, message_text, area, from_user, time_posted }
+   * Returns { username, firstName, lastName, email }
    *
    * Throws NotFoundError if not found.
+   *
+   * WARNING: this function can set a new password.
+   * Callers of this function must be certain they have validated inputs to this
+   * or a serious security risks are opened.
    */
 
-  static async update(id, data) {
-    const { setCols, values } = sqlForPartialUpdate(
-        data,
-        {});
-    const idVarIdx = "$" + (values.length + 1);
+  // static async update(username, data) {
+  //   if (data.password) {
+  //     data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
+  //   }
 
-    const querySql = `UPDATE messages 
-                      SET ${setCols} 
-                      WHERE id = ${idVarIdx} 
-                      RETURNING id, 
-                                message_text AS "messageText", 
-                                area, 
-                                from_user AS "fromUser",
-                                company_handle AS "companyHandle"`;
-    const result = await db.query(querySql, [...values, id]);
-    const message = result.rows[0];
+  //   const { setCols, values } = sqlForPartialUpdate(
+  //       data,
+  //       {
+  //         firstName: "first_name",
+  //         lastName: "last_name",
+  //         email: "email"
+  //       });
+  //   const usernameVarIdx = "$" + (values.length + 1);
 
-    if (!message) throw new NotFoundError(`No message: ${id}`);
+  //   const querySql = `UPDATE users 
+  //                     SET ${setCols} 
+  //                     WHERE username = ${usernameVarIdx} 
+  //                     RETURNING username,
+  //                               first_name AS "firstName",
+  //                               last_name AS "lastName",
+  //                               email`;
+  //   const result = await db.query(querySql, [...values, username]);
+  //   const user = result.rows[0];
 
-    return message;
-  }
+  //   if (!user) throw new NotFoundError(`No user: ${username}`);
 
-  /** Delete given message from database; returns undefined.
-   *
-   * Throws NotFoundError if message not found.
-   **/
+  //   delete user.password;
+  //   return user;
+  // }
 
-  static async remove(id) {
-    const result = await db.query(
-          `DELETE
-           FROM messages
-           WHERE id = $1
-           RETURNING id`, [id]);
-    const message = result.rows[0];
+  /** Delete given user from database; returns undefined. */
 
-    if (!message) throw new NotFoundError(`No message: ${id}`);
-  }
+  // static async remove(username) {
+  //   let result = await db.query(
+  //         `DELETE
+  //          FROM users
+  //          WHERE username = $1
+  //          RETURNING username`,
+  //       [username],
+  //   );
+  //   const user = result.rows[0];
+
+  //   if (!user) throw new NotFoundError(`No user: ${username}`);
+  // }
+
 }
 
-module.exports = Message;
+
+module.exports = DogShelterRq;

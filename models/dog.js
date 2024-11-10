@@ -10,7 +10,7 @@ const {
 
 /** Related functions for dogs (owner relinquished). */
 
-class DogOwnerRq {
+class Dog {
 
   /** Find all dogs.
    *
@@ -19,7 +19,7 @@ class DogOwnerRq {
 
   static async findAll() {
     const result = await db.query(
-      `SELECT dog_id, dog_name FROM dogs_owner_rq`
+      `SELECT dog_id, dog_name FROM dogs`
     );
 
     return result.rows;
@@ -32,12 +32,12 @@ class DogOwnerRq {
    * Throws NotFoundError if user not found.
    **/
 
-  static async find(dog_id) {
+  static async find(dog_name) {
     const result = await db.query(
       `SELECT *
-           FROM dogs_owner_rq
-           WHERE dog_id = $1`,
-      [dog_id],
+           FROM dogs
+           WHERE dog_name = $1`,
+      [dog_name],
     );
 
     const dog = result.rows[0];
@@ -53,7 +53,8 @@ class DogOwnerRq {
  **/
 
   static async create(
-    { owner_first_name,
+    { shelter_or_owner,
+      owner_first_name,
       owner_last_name,
       owner_st_address,
       owner_city,
@@ -62,15 +63,23 @@ class DogOwnerRq {
       owner_email,
       owner_home_phone,
       owner_cell_phone,
+      shelter_name,
+      contact_name,
+      contact_type,
+      contact_method,
+      contact_method_details,
       photos,
       dog_name,
       dog_sex,
       dog_age,
+      dog_weight,
       dog_color,
       dog_breed,
+      rescue_reason,
+      intake_type,
       relinquish_reason,
-      how_far_owner,
-      dog_purchase,
+      transportation,
+      dog_history,
       dog_bite,
       dog_nip,
       dog_health,
@@ -94,90 +103,108 @@ class DogOwnerRq {
       dog_animals,
       attest }) {
     const result = await db.query(
-      `INSERT INTO dogs_owner_rq
-           (owner_first_name,
-            owner_last_name,
-            owner_st_address,
-            owner_city,
-            owner_state,
-            owner_zip,
-            owner_email,
-            owner_home_phone,
-            owner_cell_phone,
-            photos,
-            dog_name,
-            dog_sex,
-            dog_age,
-            dog_color,
-            dog_breed,
-            relinquish_reason,
-            how_far_owner,
-            dog_purchase,
-            dog_bite,
-            dog_nip,
-            dog_health,
-            dog_vet_hist,
-            dog_heartworm,
-            dog_kids,
-            dog_negative,
-            dog_fearful,
-            dog_negative_deets,
-            dog_noises,
-            dog_movement,
-            dog_tricks,
-            dog_adjectives,
-            dog_agro_examples,
-            dog_improvement,
-            dog_location,
-            dog_alone,
-            dog_crate_time,
-            dog_crate_behavior,
-            dog_crate_behavior_deets,
-            dog_animals,
-            attest)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40)
-           RETURNING dog_name`,
+      `INSERT INTO dogs
+           (shelter_or_owner,
+      owner_first_name,
+      owner_last_name,
+      owner_st_address,
+      owner_city,
+      owner_state,
+      owner_zip,
+      owner_email,
+      owner_home_phone,
+      owner_cell_phone,
+      shelter_name,
+      contact_name,
+      contact_type,
+      contact_method,
+      contact_method_details,
+      photos,
+      dog_name,
+      dog_sex,
+      dog_age,
+      dog_weight,
+      dog_color,
+      dog_breed,
+      rescue_reason,
+      intake_type,
+      relinquish_reason,
+      transportation,
+      dog_history,
+      dog_bite,
+      dog_nip,
+      dog_health,
+      dog_vet_hist,
+      dog_heartworm,
+      dog_kids,
+      dog_negative,
+      dog_fearful,
+      dog_negative_deets,
+      dog_noises,
+      dog_movement,
+      dog_tricks,
+      dog_adjectives,
+      dog_agro_examples,
+      dog_improvement,
+      dog_location,
+      dog_alone,
+      dog_crate_time,
+      dog_crate_behavior,
+      dog_crate_behavior_deets,
+      dog_animals,
+      attest)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49)
+           RETURNING dog_id`,
       [
+        shelter_or_owner,
         owner_first_name,
-            owner_last_name,
-            owner_st_address,
-            owner_city,
-            owner_state,
-            owner_zip,
-            owner_email,
-            owner_home_phone,
-            owner_cell_phone,
-            photos,
-            dog_name,
-            dog_sex,
-            dog_age,
-            dog_color,
-            dog_breed,
-            relinquish_reason,
-            how_far_owner,
-            dog_purchase,
-            dog_bite,
-            dog_nip,
-            dog_health,
-            dog_vet_hist,
-            dog_heartworm,
-            dog_kids,
-            dog_negative,
-            dog_fearful,
-            dog_negative_deets,
-            dog_noises,
-            dog_movement,
-            dog_tricks,
-            dog_adjectives,
-            dog_agro_examples,
-            dog_improvement,
-            dog_location,
-            dog_alone,
-            dog_crate_time,
-            dog_crate_behavior,
-            dog_crate_behavior_deets,
-            dog_animals,
-            attest
+        owner_last_name,
+        owner_st_address,
+        owner_city,
+        owner_state,
+        owner_zip,
+        owner_email,
+        owner_home_phone,
+        owner_cell_phone,
+        shelter_name,
+        contact_name,
+        contact_type,
+        contact_method,
+        contact_method_details,
+        photos,
+        dog_name,
+        dog_sex,
+        dog_age,
+        dog_weight,
+        dog_color,
+        dog_breed,
+        rescue_reason,
+        intake_type,
+        relinquish_reason,
+        transportation,
+        dog_history,
+        dog_bite,
+        dog_nip,
+        dog_health,
+        dog_vet_hist,
+        dog_heartworm,
+        dog_kids,
+        dog_negative,
+        dog_fearful,
+        dog_negative_deets,
+        dog_noises,
+        dog_movement,
+        dog_tricks,
+        dog_adjectives,
+        dog_agro_examples,
+        dog_improvement,
+        dog_location,
+        dog_alone,
+        dog_crate_time,
+        dog_crate_behavior,
+        dog_crate_behavior_deets,
+        dog_animals,
+        attest
       ],
     );
 
@@ -235,20 +262,20 @@ class DogOwnerRq {
 
   /** Delete given user from database; returns undefined. */
 
-  // static async remove(username) {
-  //   let result = await db.query(
-  //         `DELETE
-  //          FROM users
-  //          WHERE username = $1
-  //          RETURNING username`,
-  //       [username],
-  //   );
-  //   const user = result.rows[0];
+   static async remove(dog_id) {
+     let result = await db.query(
+           `DELETE
+            FROM dogs
+            WHERE dog_id = $1
+            RETURNING dog_id`,
+         [dog_id],
+     );
+     const dog = result.rows[0];
 
-  //   if (!user) throw new NotFoundError(`No user: ${username}`);
-  // }
+     if (!dog) throw new NotFoundError(`No dog with id: ${dog_id}`);
+   }
 
 }
 
 
-module.exports = DogOwnerRq;
+module.exports = Dog;

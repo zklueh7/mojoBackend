@@ -3,7 +3,7 @@
 /** Routes for messages. */
 
 const express = require("express");
-const Dog = require("../models/dog_owner_rq");
+const Dog = require("../models/dog");
 
 const router = express.Router();
 
@@ -52,5 +52,20 @@ router.post("/", async function (req, res, next) {
     return next(err);
   }
 });
+
+/** DELETE /[dog_id]  =>  { deleted: username }
+ *
+ * Authorization required: admin or same-user-as-:username
+ **/
+
+router.delete("/:dog_id", async function (req, res, next) {
+  try {
+    await Dog.remove(req.params.dog_id);
+    return res.json({ deleted: req.params.dog_id });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 
 module.exports = router;
