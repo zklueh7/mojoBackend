@@ -60,6 +60,28 @@ CREATE TABLE dogs (
   attest TEXT
 );
 
+CREATE TABLE volunteers (
+  volunteer_id SERIAL PRIMARY KEY,
+  name TEXT,
+  address TEXT,
+  phone TEXT,
+  email TEXT,
+  fence TEXT,
+  dogs TEXT,
+  cats TEXT,
+  animals TEXT,
+  children TEXT,
+  overnight TEXT,
+  restrictions TEXT,
+  pickup TEXT,
+  vehicle TEXT,
+  crates TEXT,
+  distance TEXT,
+  evaluate TEXT,
+  home_visits TEXT,
+  events TEXT
+);
+
 -- CREATE TABLE dogs_owner_rq (
 --   dog_id SERIAL PRIMARY KEY,
 --   owner_first_name TEXT,
