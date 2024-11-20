@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.get("/", async function (req, res, next) {
   try {
-    const volunteerss = await Volunteer.findAll();
+    const volunteers = await Volunteer.findAll();
     return res.json({ volunteers });
   } catch (err) {
     return next(err);

@@ -19,7 +19,7 @@ class Volunteer {
 
     static async findAll() {
         const result = await db.query(
-            `SELECT volunteer_id, volunteer_name FROM volunteers`
+            `SELECT volunteer_id, name FROM volunteers`
         );
 
         return result.rows;
