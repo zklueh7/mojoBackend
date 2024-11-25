@@ -28,9 +28,9 @@ router.get("/", async function (req, res, next) {
  *
  **/
 
-router.get("/:volunteer_name", async function (req, res, next) {
+router.get("/:volunteer", async function (req, res, next) {
   try {
-    const volunteer = await Volunteer.find(req.params.volunteer_name);
+    const volunteer = await Volunteer.find(req.params.volunteer);
     return res.json({ volunteer });
   } catch (err) {
     return next(err);

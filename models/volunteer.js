@@ -25,27 +25,27 @@ class Volunteer {
         return result.rows;
     }
 
-    /** Given a username, return data about user.
+    /** Given a volunteer id, return data about volunteer.
      *
      * Returns { username, first_name, last_name, looking_for_partners, climbing_type, experience_level, picture_url }
      *
      * Throws NotFoundError if user not found.
      **/
 
-    //   static async find(volunteer_name) {
-    //     const result = await db.query(
-    //       `SELECT *
-    //            FROM dogs
-    //            WHERE dog_name = $1`,
-    //       [dog_name],
-    //     );
+      static async find(name) {
+        const result = await db.query(
+          `SELECT *
+               FROM volunteers
+               WHERE name = $1`,
+          [name],
+        );
 
-    //     const dog = result.rows[0];
+        const volunteer = result.rows[0];
 
-    //     if (!dog) throw new NotFoundError(`No dog: ${dog_name}`);
+        if (!volunteer) throw new NotFoundError(`Volunteer not found`);
 
-    //     return dog;
-    //   }
+        return volunteer;
+      }
 
     /** Add new dog data
    *
@@ -169,18 +169,18 @@ class Volunteer {
 
     /** Delete given user from database; returns undefined. */
 
-    //    static async remove(dog_id) {
-    //      let result = await db.query(
-    //            `DELETE
-    //             FROM dogs
-    //             WHERE dog_id = $1
-    //             RETURNING dog_id`,
-    //          [dog_id],
-    //      );
-    //      const dog = result.rows[0];
+       static async remove(volunteer_id) {
+         let result = await db.query(
+               `DELETE
+                FROM volunteers
+                WHERE volunteer_id = $1
+                RETURNING volunteer_id`,
+             [volunteer_id],
+         );
+         const volunteer = result.rows[0];
 
-    //      if (!dog) throw new NotFoundError(`No dog with id: ${dog_id}`);
-    //    }
+         if (!volunteer) throw new NotFoundError(``);
+       }
 
 }
 
